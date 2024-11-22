@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git pull origin main --ff-only
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 19
           architecture: arm64
