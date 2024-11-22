@@ -1,0 +1,35 @@
+{
+  "name": "@cryptlex/lexactivator",
+  "version": "3.30.3",
+  "description": "LexActivator API wrapper for Node.js.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "cryptlex",
+    "lexactivator",
+    "licensing library"
+  ],
+  "author": "Cryptlex, LLC",
+  "license": "MIT",
+  "dependencies": {
+    "detect-libc": "~2.0.1",
+    "node-addon-api": "~3.2.1"
+  },
+  "devDependencies": {
+    "@types/detect-libc": "^1.0.0",
+    "@types/node": "18.11.9",
+    "@typescript-eslint/eslint-plugin": "5.44.0",
+    "@typescript-eslint/parser": "5.44.0",
+    "eslint": "8.28.0",
+    "typescript": "4.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cryptlex/lexactivator-js.git"
+  },
+  "homepage": "https://cryptlex.com",
+  "gypfile": false
+}
