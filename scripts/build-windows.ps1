@@ -24,10 +24,4 @@ node-gyp rebuild --arch=ia32
 Copy-Item -Path ".\build\Release\lexactivator.node" -Destination ".\lib\bindings\windows\x32\lexactivator.node"
 Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc14\x86\LexActivator.dll" -Destination ".\lib\bindings\windows\x32\LexActivator.dll"
 
-Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc17\arm64\LexActivator.lib" -Destination ".\"
-npm i
-node-gyp rebuild 
-
-Copy-Item -Path ".\build\Release\lexactivator.node" -Destination ".\lib\bindings\windows\arm64\lexactivator.node"
-Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc17\arm64\LexActivator.dll" -Destination ".\lib\bindings\windows\arm64\LexActivator.dll"
 
