@@ -15,9 +15,17 @@ jobs:
 
       - run: git pull origin main --ff-only
 
-      - uses: actions/setup-node@v1
+      - name: Set up Node.js
+        if: matrix.os != 'windows-2022'
+        uses: actions/setup-node@v1
         with:
           node-version: 10
+
+      - name: Set up Node.js for Windows ARM64
+        if: matrix.os == 'windows-2022'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       # - name: Install Windows 2015 build tools
       #   if: matrix.os == 'windows-2019'
@@ -32,9 +40,6 @@ jobs:
 
       - name: Build for Windows-Arm64
         if: matrix.os == 'windows-2022'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20          
         shell: powershell
         run: |
           npm i -g node-gyp@10
@@ -74,6 +79,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+
       - run: git pull origin main --ff-only
 
       - name: 'Download artifacts'
