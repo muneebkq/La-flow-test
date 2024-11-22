@@ -4,65 +4,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows-x86-x64:
-    runs-on: windows-2019
+  # Link LexActivator static libs to Node
+  build-addons:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-2019, windows-2022]
     steps:
       - uses: actions/checkout@v2
-      - run: git pull origin main --ff-only
+
+      - run: git pull origin master --ff-only
+
       - uses: actions/setup-node@v1
         with:
           node-version: 10
-      - name: Build for Windows x86/x64
+
+      # - name: Install Windows 2015 build tools
+      #   if: matrix.os == 'windows-2019'
+      #   run: npm i --global windows-build-tools --vs2015
+
+      - name: Build for Windows
+        if: matrix.os == 'windows-2019'
         shell: powershell
         run: |
           npm i -g node-gyp@8
           .\scripts\build-windows.ps1
-      - name: 'Upload x86/x64 artifacts'
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-x86-x64-artifacts
-          path: |
-            ./lib/bindings/windows/x32/*.node
-            ./lib/bindings/windows/x32/*.dll
-            ./lib/bindings/windows/x64/*.node
-            ./lib/bindings/windows/x64/*.dll
-          retention-days: 1
 
-  build-windows-arm64:
-    needs: build-windows-x86-x64
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v2
-      - run: git pull origin main --ff-only
-      - uses: actions/setup-node@v4
+      - name: Build for Windows-Arm64
+        if: matrix.os == 'windows-2022'
+        uses: actions/setup-node@v4
         with:
-          node-version: 19
-          architecture: arm64
-      - name: Build for Windows ARM64
+          node-version: 20          
         shell: powershell
         run: |
           npm i -g node-gyp@10
           .\scripts\build-windows-arm64.ps1
-      - name: 'Upload ARM64 artifacts'
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-arm64-artifacts
-          path: |
-            ./lib/bindings/windows/arm64/*.node
-            ./lib/bindings/windows/arm64/*.dll
-          retention-days: 1
-
-  build-other-platforms:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-13]
-    steps:
-      - uses: actions/checkout@v2
-      - run: git pull origin main --ff-only
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 10
 
       - name: Build for macOS
         if: matrix.os == 'macos-13'
@@ -77,59 +53,40 @@ jobs:
           docker run -t -v $PWD:$PWD -w $PWD cryptlex/gcc-4.9-arm:1 ./scripts/build-linux-arm.sh
           docker run -t -v $PWD:$PWD -w $PWD cryptlex/alpine-builder:2 ./scripts/build-linux-musl.sh
 
-      - name: 'Upload platform artifacts'
+      - name: 'Upload artifacts'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-artifacts
+          name: artifacts
           path: |
             ./lib/bindings/linux/**/**/*.node
             ./lib/bindings/macos/**/*.node
+            ./lib/bindings/windows/**/*.node
+            ./lib/bindings/windows/**/*.dll
           retention-days: 1
+  
+  # Publish to NPM
+  publish-npm:
+    needs: build-addons
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: git pull origin master --ff-only
 
-  # publish-npm:
-  #   needs: [build-windows-x86-x64, build-windows-arm64, build-other-platforms]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16
-  #         registry-url: https://registry.npmjs.org/
-  #     - run: git pull origin master --ff-only
+      - name: 'Download artifacts'
+        uses: actions/download-artifact@v3
+        with:
+          path: ./lib/bindings
+          name: artifacts
 
-  #     - name: 'Download all artifacts'
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         path: ./lib/bindings
+      - name: 'Build library'
+        run: |
+          npm ci
+          npm run build
 
-  #     - name: 'Reorganize artifacts'
-  #       run: |
-  #         # Move files from artifact directories to their correct locations
-  #         find . -name "*.node" -o -name "*.dll" | while read file; do
-  #           if [[ $file == *"windows-x86-x64-artifacts"* ]]; then
-  #             target_dir=$(echo $file | sed 's/.*windows-x86-x64-artifacts/windows/')
-  #             mkdir -p $(dirname $target_dir)
-  #             mv $file $target_dir
-  #           elif [[ $file == *"windows-arm64-artifacts"* ]]; then
-  #             target_dir=$(echo $file | sed 's/.*windows-arm64-artifacts/windows/')
-  #             mkdir -p $(dirname $target_dir)
-  #             mv $file $target_dir
-  #           elif [[ $file == *"ubuntu-latest-artifacts"* ]]; then
-  #             target_dir=$(echo $file | sed 's/.*ubuntu-latest-artifacts/linux/')
-  #             mkdir -p $(dirname $target_dir)
-  #             mv $file $target_dir
-  #           elif [[ $file == *"macos-13-artifacts"* ]]; then
-  #             target_dir=$(echo $file | sed 's/.*macos-13-artifacts/macos/')
-  #             mkdir -p $(dirname $target_dir)
-  #             mv $file $target_dir
-  #           fi
-  #         done
-
-  #     - name: 'Build library'
-  #       run: |
-  #         npm ci
-  #         npm run build
-
-  #     - run: npm publish --access public
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
