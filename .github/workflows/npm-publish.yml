@@ -16,7 +16,7 @@ jobs:
         shell: powershell
         run: |
           npm i -g node-gyp@8
-          .\scripts\build-windows-x86-x64.ps1
+          .\scripts\build-windows.ps1
       - name: 'Upload x86/x64 artifacts'
         uses: actions/upload-artifact@v3
         with:
