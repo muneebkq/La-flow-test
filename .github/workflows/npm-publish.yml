@@ -10,13 +10,23 @@ jobs:
         os: [windows-2019, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - run: git pull origin main --ff-only
-        name: Build for Windows 2019
-        uses: actions/setup-node@v1
+      - name: Checkout Repository
+        uses: actions/checkout@v1
+
+      - name: Pull Latest Code
+        run: git pull origin main --ff-only
+
+      # Step for Windows 2019
+      - name: Setup Node.js and Build for Windows 2019
+        if: matrix.os == 'windows-2019'
+        uses: actions/setup-node@v3
         with:
           node-version: 10
-        shell: powershell
         run: |
           npm i -g node-gyp@8
-          .\scripts\build-windows.ps1
+          powershell ./scripts/build-windows.ps1
+
+      # Step for Windows 2022
+      - name: Build for Windows 2022
+        if: matrix.os == 'windows-2022'
+        run: echo "Hello
