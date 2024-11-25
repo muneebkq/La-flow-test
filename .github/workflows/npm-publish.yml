@@ -14,7 +14,13 @@ jobs:
       - run: git pull origin main --ff-only
       - if: matrix.os == 'windows-2019'
         name: Build for Windows 2019
-        run: echo "Hello, world! 2019"
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+        shell: powershell
+        run: |
+          npm i -g node-gyp@8
+          .\scripts\build-windows.ps1
       - if: matrix.os == 'windows-2022'
         name: Build for Windows 2022
         run: echo "Hello, world! 2022"
