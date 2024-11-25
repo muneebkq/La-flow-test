@@ -15,13 +15,13 @@ jobs:
 
       - run: git pull origin main --ff-only
 
-      - name: Set up Node.js
-        if: matrix.os != 'windows-2022'
+      - name: Set up Node.js for Windows 2019
+        if: matrix.os == 'windows-2019'
         uses: actions/setup-node@v1
         with:
           node-version: 10
 
-      - name: Set up Node.js for Windows ARM64
+      - name: Set up Node.js for Windows 2022
         if: matrix.os == 'windows-2022'
         uses: actions/setup-node@v4
         with:
@@ -55,7 +55,6 @@ jobs:
             ./lib/bindings/windows/**/*.node
             ./lib/bindings/windows/**/*.dll
           retention-days: 1
-  
   # Publish to NPM
   publish-npm:
     needs: build-addons
