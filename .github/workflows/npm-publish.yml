@@ -4,12 +4,14 @@ on:
     branches:
       - main
 jobs:
-  build-windows-addons:
+  build-addons:
     strategy:
       matrix:
         os: [windows-2019, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
+      - uses: actions/checkout@v4
+      - run: git pull origin master --ff-only
       - if: matrix.os == 'windows-2019'
         name: Build for Windows 2019
         run: echo "Hello, world! 2019"
