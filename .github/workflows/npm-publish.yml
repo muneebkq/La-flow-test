@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - run: git pull origin master --ff-only
+      - run: git pull origin main --ff-only
       - if: matrix.os == 'windows-2019'
         name: Build for Windows 2019
         run: echo "Hello, world! 2019"
