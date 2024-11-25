@@ -10,16 +10,10 @@ jobs:
         os: [windows-2019, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout Repository
-        if: matrix.os == 'windows-2019'
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Checkout Repository
-        if: matrix.os == 'windows-2022'
-        uses: actions/checkout@v4
+      - run: git pull origin master --ff-only
 
-      - name: Pull Latest Code
-        run: git pull origin main --ff-only
 
       # Step for Windows 2019
       - name: Setup Node.js 
