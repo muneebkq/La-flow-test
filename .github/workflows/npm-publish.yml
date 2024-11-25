@@ -10,7 +10,7 @@ jobs:
         os: [windows-2019, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
       - run: git pull origin main --ff-only
       - if: matrix.os == 'windows-2019'
         name: Build for Windows 2019
