@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019, windows-2022]
-    runs-on: ${{ matrix.os }}ß
+    runs-on: ${{ matrix.os }}
     steps:
       - if: matrix.os == 'windows-2019'
         run: echo "Hello, world! 2019"
