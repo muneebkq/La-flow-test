@@ -34,12 +34,6 @@ jobs:
         run: |
           npm i -g node-gyp@8
           .\scripts\build-windows.ps1
-  
-      - name: Build for Windows 2022
-        if: matrix.os == 'windows-2022'
-        shell: powershell
-        run: |
-          npm i -g node-gyp@10
-          .\scripts\build-windows-arm64.ps1
+
 
 
