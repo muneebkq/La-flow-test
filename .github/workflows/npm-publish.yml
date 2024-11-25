@@ -1,15 +1,9 @@
-name: Build @cryptlex/lexactivator package
+name: Build myfirstaddon package
 
-on:
-  workflow_dispatch:
-
-jobs:
-  # Link LexActivator static libs to Node
-  build-addons:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-13, windows-2019]
+        os: [windows-2019]
     steps:
       - uses: actions/checkout@v2
 
@@ -40,4 +34,3 @@ jobs:
             ./lib/bindings/windows/**/*.node
             ./lib/bindings/windows/**/*.dll
           retention-days: 1
-  
