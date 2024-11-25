@@ -9,7 +9,4 @@ jobs:
       matrix:
         os: [windows-2019, windows-2022]
     steps:
-      - if: matrix.os == 'windows-2019'
-        run: echo "Hello, world! 2019"
-      - if: matrix.os == 'windows-2022'
-        run: echo "Hello, world! 2022"
+      - run: echo "Hello, world!"
