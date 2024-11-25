@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-13, windows-2019, windows-2022]
+        os: [windows-2019, windows-2022]
     steps:
       - uses: actions/checkout@v2
 
@@ -44,19 +44,6 @@ jobs:
         run: |
           npm i -g node-gyp@10
           .\scripts\build-windows-arm64.ps1
-
-      - name: Build for macOS
-        if: matrix.os == 'macos-13'
-        run: |
-          npm i -g node-gyp@8
-          ./scripts/build-macos.sh
-
-      - name: Build for Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          docker run -t -v $PWD:$PWD -w $PWD cryptlex/gcc-4.9:1 ./scripts/build-linux.sh
-          docker run -t -v $PWD:$PWD -w $PWD cryptlex/gcc-4.9-arm:1 ./scripts/build-linux-arm.sh
-          docker run -t -v $PWD:$PWD -w $PWD cryptlex/alpine-builder:2 ./scripts/build-linux-musl.sh
 
       - name: 'Upload artifacts'
         uses: actions/upload-artifact@v3
