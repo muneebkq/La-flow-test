@@ -26,13 +26,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build for Windows 2022
-        if: matrix.os == 'windows-2022'
-        shell: powershell
-        run: |
-          npm i -g node-gyp@10
-          .\scripts\build-windows.ps1
-
       - name: Build for Windows 2019
         if: matrix.os == 'windows-2019'
         shell: powershell
