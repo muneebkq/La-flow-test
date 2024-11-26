@@ -14,15 +14,14 @@ jobs:
 
       - run: git pull origin main --ff-only
 
-
       # Step for Windows 2019
-      - name: Setup Node.js 
+      - name: Setup Node.js v3
         if: matrix.os == 'windows-2019'
         uses: actions/setup-node@v3
         with:
           node-version: 10
   
-      - name: Setup Node.js
+      - name: Setup Node.js v4
         if: matrix.os == 'windows-2022'
         uses: actions/setup-node@v4
         with:
@@ -34,6 +33,30 @@ jobs:
         run: |
           npm i -g node-gyp@8
           .\scripts\build-windows.ps1
+      
+      - name: Build for macOS
+        if: matrix.os == 'macos-13'
+        run: |
+          npm i -g node-gyp@8
+          ./scripts/build-macos.sh
+
+      - name: Build for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          docker run -t -v $PWD:$PWD -w $PWD cryptlex/gcc-4.9:1 ./scripts/build-linux.sh
+          docker run -t -v $PWD:$PWD -w $PWD cryptlex/gcc-4.9-arm:1 ./scripts/build-linux-arm.sh
+          docker run -t -v $PWD:$PWD -w $PWD cryptlex/alpine-builder:2 ./scripts/build-linux-musl.sh
+
+      - name: 'Upload artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: |
+            ./lib/bindings/linux/**/**/*.node
+            ./lib/bindings/macos/**/*.node
+            ./lib/bindings/windows/**/*.node
+            ./lib/bindings/windows/**/*.dll
+          retention-days: 1
 
 
 
