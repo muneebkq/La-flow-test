@@ -1,33 +1,25 @@
-name: Build @cryptlex/lexactivator package
-
+name: Build myfirstaddon package
 on:
-  workflow_dispatch:
-
+  push:
+    branches:
+      - main
 jobs:
-
   build-addons:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-13, windows-2019, windows-2022]
+        os: [windows-2019, windows-2022, ubuntu-latest, macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 
-      - run: git pull origin master --ff-only
-
+      - run: git pull origin main --ff-only
+      # Step for Windows 2019
       - name: Setup Node.js v1
-        if: matrix.os != 'windows-2022'
+        if: matrix.os == 'windows-2019'
         uses: actions/setup-node@v1
         with:
           node-version: 10
 
-      - name: Build for Windows 2019
-        if: matrix.os == 'windows-2019'
-        shell: powershell
-        run: |
-          npm i -g node-gyp@8
-          .\scripts\build-windows.ps1
-      
       - name: Setup Node.js v4
         if: matrix.os == 'windows-2022'
         uses: actions/setup-node@v4
@@ -39,6 +31,13 @@ jobs:
         shell: powershell
         run: |
           npm i -g node-gyp@10
+          .\scripts\build-windows-arm64.ps1
+
+      - name: Build for Windows 2019
+        if: matrix.os == 'windows-2019'
+        shell: powershell
+        run: |
+          npm i -g node-gyp@8
           .\scripts\build-windows-arm64.ps1
       
       - name: Build for macOS
@@ -64,30 +63,3 @@ jobs:
             ./lib/bindings/windows/**/*.node
             ./lib/bindings/windows/**/*.dll
           retention-days: 1
-  
-  # Publish to NPM
-  publish-npm:
-    needs: build-addons
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: git pull origin master --ff-only
-
-      - name: 'Download artifacts'
-        uses: actions/download-artifact@v3
-        with:
-          path: ./lib/bindings
-          name: artifacts
-
-      - name: 'Build library'
-        run: |
-          npm ci
-          npm run build
-
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
