@@ -1,4 +1,5 @@
-lexactivator_version ="v3.30.3"
+$base_url = "https://dl.cryptlex.com/downloads"
+$lexactivator_version ="v3.30.3"
 
 New-Item -Path ".\tmp\windows" -ItemType Directory
 $url = "$base_url/$lexactivator_version/LexActivator-Win.zip"
@@ -13,5 +14,5 @@ Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc14\x64\LexActivator.lib" 
 npm i
 node-gyp rebuild 
 
-Copy-Item -Path ".\build\Release\lexactivator.node" -Destination ".\lib\bindings\windows\x64\lexactivator.node"
-Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc14\x64\LexActivator.dll" -Destination ".\lib\bindings\windows\x64\LexActivator.dll"
+Copy-Item -Path ".\build\Release\lexactivator.node" -Destination ".\lib\bindings\windows\arm64\lexactivator.node"
+Copy-Item -Path ".\tmp\windows\LexActivator-Win\libs\vc14\x64\LexActivator.dll" -Destination ".\lib\bindings\windows\arm64\LexActivator.dll"
