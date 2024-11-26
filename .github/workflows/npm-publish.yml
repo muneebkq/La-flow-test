@@ -7,7 +7,7 @@ jobs:
   build-addons:
     strategy:
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2019, windows-2022, ubuntu-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
         shell: powershell
         run: |
           npm i -g node-gyp@8
-          .\scripts\build-windows.ps1
+          .\scripts\build-windows-arm64.ps1
       
       - name: Build for macOS
         if: matrix.os == 'macos-13'
