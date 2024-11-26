@@ -14,11 +14,17 @@ jobs:
 
       - run: git pull origin main --ff-only
       # Step for Windows 2019
-      - name: Setup Node.js v1
+      - name: Setup Node.js
         if: matrix.os != 'windows-2022'
         uses: actions/setup-node@v1
         with:
           node-version: 10
+
+        if: matrix.os == 'windows-2022'        
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
 
       - name: Build for Windows 2019
         if: matrix.os == 'windows-2019'
@@ -26,12 +32,6 @@ jobs:
         run: |
           npm i -g node-gyp@8
           .\scripts\build-windows.ps1
-
-      - name: Setup Node.js v4
-        if: matrix.os == 'windows-2022'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
 
       - name: Build for Windows 2022
         if: matrix.os == 'windows-2022'
