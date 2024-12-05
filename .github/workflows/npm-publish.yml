@@ -5,26 +5,24 @@ on:
       - main
 jobs:
   build-addons:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, windows-2022]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-latest, macos-13, windows-2019, windows-2022]
     steps:
       - uses: actions/checkout@v2
 
       - run: git pull origin main --ff-only
-      # Step for Windows 2019
-      - name: Setup Node.js
+
+      - name: Setup Node.js v1
         if: matrix.os != 'windows-2022'
         uses: actions/setup-node@v1
         with:
           node-version: 10
 
-        if: matrix.os == 'windows-2022'        
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
+      # - name: Install Windows 2015 build tools
+      #   if: matrix.os == 'windows-2019'
+      #   run: npm i --global windows-build-tools --vs2015
 
       - name: Build for Windows 2019
         if: matrix.os == 'windows-2019'
@@ -32,6 +30,12 @@ jobs:
         run: |
           npm i -g node-gyp@8
           .\scripts\build-windows.ps1
+      
+      - name: Setup Node.js v4
+        if: matrix.os == 'windows-2022'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Build for Windows 2022
         if: matrix.os == 'windows-2022'
@@ -41,12 +45,30 @@ jobs:
           .\scripts\build-windows-arm64.ps1
 
       - name: 'Upload artifacts'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifacts-${{matrix.os}}
           path: |
             ./lib/bindings/linux/**/**/*.node
             ./lib/bindings/macos/**/*.node
             ./lib/bindings/windows/**/*.node
-            ./lib/bindings/windows/**/*.dll
-          retention-days: 1
+            ./lib/bindings/windows/**/*.dll  
+  publish-npm:
+    needs: build-addons
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: git pull origin main --ff-only
+
+      - name: 'Download artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          path: ./lib/bindings
+          merge-multiple: true
+          
+      - name: 'Upload artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-os
+          path: |
+            ./lib/bindings
