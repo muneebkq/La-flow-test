@@ -43,6 +43,12 @@ jobs:
         run: |
           npm i -g node-gyp@10
           .\scripts\build-windows-arm64.ps1
+      
+      - name: Build for macOS
+        if: matrix.os == 'macos-13'
+        run: |
+          npm i -g node-gyp@8
+          ./scripts/build-macos.sh
 
       - name: 'Upload artifacts'
         uses: actions/upload-artifact@v4
