@@ -41,7 +41,7 @@ jobs:
         if: matrix.os == 'windows-2022'
         shell: powershell
         run: |
-          npm i -g node-gyp@10
+          npm i -g node-gyp@8
           .\scripts\build-windows-arm64.ps1
       
       - name: Build for macOS
